@@ -5,8 +5,8 @@ repositories:
   - name: jenkins
     url: https://charts.jenkins.io
 
-  - name: gitea
-    url: https://dl.gitea.com/charts/
+  #- name: gitea
+  #  url: https://dl.gitea.com/charts/
 
   - name: harbor
     url: https://helm.goharbor.io
@@ -37,13 +37,13 @@ releases:
     values:
       - values/jenkins/values.yaml
 
-  - name: gitea
-    namespace: gitea
-    createNamespace: true
-    chart: gitea/gitea
-    version: 11.0.0
-    values:
-      - values/gitea/values.yaml
+  #- name: gitea
+  #  namespace: gitea
+  #  createNamespace: true
+  #  chart: gitea/gitea
+  #  version: 11.0.0
+  #  values:
+  #    - values/gitea/values.yaml
 
   - name: harbor
     namespace: harbor
