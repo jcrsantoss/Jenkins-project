@@ -24,7 +24,7 @@ passwd:
 	@kubectl get secret -n jenkins jenkins -ojson | jq -r '.data."jenkins-admin-password"' | base64 -d
 	@echo ""
 	@echo "GITEA:"
-	@echo "r8sA8CPHD9!bt6d | jenkins: fv#4ChTvoBhtRc"
+	@echo "r8sA8CPHD9!bt6d | jenkins: 12345678"
 	@echo "SONARQUBE:"
 	@echo "123456"
 	@echo "ARGOCD:"

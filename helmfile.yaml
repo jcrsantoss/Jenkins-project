@@ -17,6 +17,9 @@ repositories:
   - name: argo
     url: https://argoproj.github.io/argo-helm
 
+  - name: imagepullsecret-patcher
+    url: https://empathyco.github.io/helm-charts/
+
 releases:
   - name: ingress-nginx
     namespace: ingress-nginx
@@ -30,7 +33,7 @@ releases:
     namespace: jenkins
     createNamespace: true
     chart: jenkins/jenkins
-    version: 5.6.2
+    version: 5.8.29
     values:
       - values/jenkins/values.yaml
 
@@ -65,3 +68,11 @@ releases:
     version: 6.2.3
     values:
       - values/argocd/values.yaml
+  
+  - name: imagepullsecret-patcher
+    namespace: imagepullsecret
+    createNamespace: true
+    chart: imagepullsecret-patcher/imagepullsecret-patcher
+    version: 1.0.0
+    values:
+      - values/imagepullsecret-patcher/values.yaml

@@ -37,10 +37,10 @@ controller:
     registry: "docker.io"
     # -- Controller image repository
     repository: "jenkins/jenkins"
-
     # -- Controller image tag override; i.e., tag: "2.440.1-jdk17"
-    tag:
-
+    tag: ""
+    # -- URI prefix for Jenkins (ex: "/jenkins")
+    jenkinsUriPrefix: "/jenkins"
     # -- Controller image tag label
     tagLabel: jdk17
     # -- Controller image pull policy
@@ -110,7 +110,6 @@ controller:
   # Override the default arguments passed to the war
   # overrideArgs:
   #   - --httpPort=8080
-
   # -- Resource allocation (Requests and Limits)
   resources:
     requests:
@@ -231,6 +230,10 @@ controller:
   # Use Local to preserve the client source IP and avoids a second hop for LoadBalancer and NodePort type services,
   # but risks potentially imbalanced traffic spreading.
   serviceExternalTrafficPolicy:
+
+  # If enabled, the controller is available through its service before its pods reports ready. Makes startup screen and
+  # auto-reload on restart feature possible.
+  publishNotReadyAddresses:
 
   # -- Jenkins controller service annotations
   serviceAnnotations: {}
@@ -399,10 +402,10 @@ controller:
   # Plugins will be installed during Jenkins controller start
   # -- List of Jenkins plugins to install. If you don't want to install plugins, set it to `false`
   installPlugins:
-    - kubernetes:4288.v1719f9d0c854
-    - workflow-aggregator:600.vb_57cdd26fdd7
-    - git:5.4.1
-    - configuration-as-code:1850.va_a_8c31d3158b_
+    - kubernetes:4324.vfec199a_33512
+    - workflow-aggregator:608.v67378e9d3db_1
+    - git:5.7.0
+    - configuration-as-code:1947.v7d33fe23569c
 
   # If set to false, Jenkins will download the minimum required version of all dependencies.
   # -- Download the minimum required version or latest version of all dependencies
@@ -412,8 +415,12 @@ controller:
   installLatestSpecifiedPlugins: false
 
   # -- List of plugins to install in addition to those listed in controller.installPlugins
-  additionalPlugins: []
-
+  additionalPlugins: 
+    - pipeline-stage-view:2.37
+    - multibranch-scan-webhook-trigger:1.0.11
+    - basic-branch-build-strategies:228.v68c089762a_db_
+    - discord-notifier:260.v8f28622b_a_6b_7
+    
   # Without this; whenever the controller gets restarted (Evicted, etc.) it will fetch plugin updates that have the potential to cause breakage.
   # Note that for this to work, `persistence.enabled` needs to be set to `true`
   # -- Initialize only on first installation. Ensures plugins do not get updated inadvertently. Requires `persistence.enabled` to be set to `true`
@@ -564,7 +571,7 @@ controller:
         # -- Repository of the image that triggers the reload
         repository: kiwigrid/k8s-sidecar
         # -- Tag for the image that triggers the reload
-        tag: 1.27.6
+        tag: 1.30.3
       imagePullPolicy: IfNotPresent
       resources: {}
         #   limits:
@@ -682,7 +689,7 @@ controller:
   # -- Topology spread constraints
   topologySpreadConstraints: {}
 
-  ingress:
+  ingress: 
     # -- Enables ingress
     enabled: true
 
@@ -745,7 +752,7 @@ controller:
     # kubernetes.io/tls-acme: "true"
     # For Kubernetes >= 1.18 you should specify the ingress-controller via the field ingressClassName
     # See https://kubernetes.io/blog/2020/04/02/improvements-to-the-ingress-api-in-kubernetes-1.18/#specifying-the-class-of-an-ingress
-    ingressClassName: nginx
+    # ingressClassName: nginx
     # configures the hostname e.g., jenkins-external.example.com
     hostName: jenkins.localhost.com
     tls:
@@ -951,7 +958,7 @@ agent:
     # -- Repository to pull the agent jnlp image from
     repository: "jenkins/inbound-agent"
     # -- Tag of the image to pull
-    tag: "3261.v9c670a_4748a_9-1"
+    tag: "3301.v4363ddcca_4e7-2"
   # -- Configure working directory for default agent
   workingDir: "/home/jenkins/agent"
   nodeUsageMode: "NORMAL"
@@ -982,12 +989,12 @@ agent:
       memory: "512Mi"
       # ephemeralStorage:
   livenessProbe: {}
-#    execArgs: "cat /tmp/healthy"
-#    failureThreshold: 3
-#    initialDelaySeconds: 0
-#    periodSeconds: 10
-#    successThreshold: 1
-#    timeoutSeconds: 1
+  #  execArgs: "cat /tmp/healthy"
+  #  failureThreshold: 3
+  #  initialDelaySeconds: 0
+  #  periodSeconds: 10
+  #  successThreshold: 1
+  #  timeoutSeconds: 1
 
   # You may want to change this to true while testing a new image
   # -- Always pull agent container image before build
@@ -1309,6 +1316,8 @@ rbac:
   create: true
   # -- Whether the Jenkins service account should be able to read Kubernetes secrets
   readSecrets: false
+  # -- Whether the Jenkins service account should be able to use the OpenShift "nonroot" Security Context Constraints
+  useOpenShiftNonRootSCC: false
 
 serviceAccount:
   # -- Configures if a ServiceAccount with this name should be created
@@ -1323,6 +1332,8 @@ serviceAccount:
   extraLabels: {}
   # -- Controller ServiceAccount image pull secret
   imagePullSecretName:
+  # -- Auto-mount ServiceAccount token
+  automountServiceAccountToken: true
 
 
 serviceAccountAgent:
@@ -1338,6 +1349,8 @@ serviceAccountAgent:
   extraLabels: {}
   # -- Agent ServiceAccount image pull secret
   imagePullSecretName:
+  # -- Auto-mount ServiceAccount token
+  automountServiceAccountToken: true
 
 # -- Checks if any deprecated values are used
 checkDeprecation: true
@@ -1360,4 +1373,4 @@ helmtest:
       # -- Repository of the image used to test the framework
       repository: "bats/bats"
       # -- Tag of the image to test the framework
-      tag: "1.11.0"
+      tag: "1.11.1"
